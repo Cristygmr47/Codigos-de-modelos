@@ -1,0 +1,105 @@
+1. Análisis Exploratorio de Datos (EDA)
+
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+# Configuración de estilo
+sns.set(style="whitegrid")
+
+# Distribución de Edad
+plt.figure(figsize=(12, 6))
+sns.histplot(df['Age'], bins=15, kde=True, color="skyblue")
+plt.title("Distribución de la Edad de los Clientes")
+plt.xlabel("Edad")
+plt.ylabel("Frecuencia")
+plt.show()
+
+# Distribución de Ingreso Anual
+plt.figure(figsize=(12, 6))
+sns.histplot(df['Annual Income (k$)'], bins=15, kde=True, color="salmon")
+plt.title("Distribución del Ingreso Anual (k$)")
+plt.xlabel("Ingreso Anual (k$)")
+plt.ylabel("Frecuencia")
+plt.show()
+
+# Distribución del Puntaje de Gasto
+plt.figure(figsize=(12, 6))
+sns.histplot(df['Spending Score (1-100)'], bins=15, kde=True, color="lightgreen")
+plt.title("Distribución del Puntaje de Gasto (1-100)")
+plt.xlabel("Puntaje de Gasto")
+plt.ylabel("Frecuencia")
+plt.show()
+
+# Diagrama de dispersión entre Ingreso Anual y Puntaje de Gasto
+plt.figure(figsize=(10, 6))
+sns.scatterplot(x='Annual Income (k$)', y='Spending Score (1-100)', data=df, hue='Gender', palette="viridis")
+plt.title("Relación entre Ingreso Anual y Puntaje de Gasto")
+plt.xlabel("Ingreso Anual (k$)")
+plt.ylabel("Puntaje de Gasto (1-100)")
+plt.legend(title="Género")
+plt.show()
+
+
+2. Preprocesamiento de Datos
+
+# Comprobación de valores nulos
+print(df.isnull().sum())
+
+# Conversión de Género a numérico
+df['Gender'] = df['Gender'].map({'Male': 0, 'Female': 1})
+
+
+3. Selección de Características
+
+features = df[['Annual Income (k$)', 'Spending Score (1-100)']]
+
+
+4. Entrenamiento de Modelos de Clustering
+Aquí aplicaremos K-means y clustering jerárquico.
+
+K-means:
+
+from sklearn.cluster import KMeans
+from sklearn.metrics import silhouette_score
+
+# Configuración y entrenamiento del modelo K-means
+kmeans = KMeans(n_clusters=5, random_state=0)
+clusters = kmeans.fit_predict(features)
+df['Cluster_Kmeans'] = clusters
+
+# Evaluación con coeficiente de Silhouette
+silhouette_avg = silhouette_score(features, clusters)
+print("Coeficiente de Silhouette para K-means:", silhouette_avg)
+
+Clustering Jerárquico:
+
+from scipy.cluster.hierarchy import dendrogram, linkage
+import scipy.cluster.hierarchy as sch
+
+# Generación de Dendrograma
+plt.figure(figsize=(10, 7))
+dendrogram(linkage(features, method='ward'))
+plt.title("Dendrograma para clustering jerárquico")
+plt.xlabel("Clientes")
+plt.ylabel("Distancia Euclidiana")
+plt.show()
+
+
+5. Evaluación del Desempeño
+
+from sklearn.metrics import calinski_harabasz_score, davies_bouldin_score
+
+# Calinski-Harabasz y Davies-Bouldin
+ch_score = calinski_harabasz_score(features, clusters)
+db_score = davies_bouldin_score(features, clusters)
+print("Índice de Calinski-Harabasz:", ch_score)
+print("Índice de Davies-Bouldin:", db_score)
+
+
+6. Visualización de Resultados
+
+# Visualización de clusters con K-means
+plt.figure(figsize=(10, 6))
+sns.scatterplot(x='Annual Income (k$)', y='Spending Score (1-100)', hue='Cluster_Kmeans', data=df, palette="viridis")
+plt.title("Clusters generados por K-means")
+plt.show()
